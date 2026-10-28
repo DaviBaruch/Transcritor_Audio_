@@ -12,14 +12,10 @@ services:
       - key: TRANSCRITOR_ALLOW_REGISTRATION
         value: "1"
       - key: TRANSCRITOR_DATA_ROOT
-        value: /var/data/dados_usuarios
+        value: /tmp/dados_usuarios
       - key: TRANSCRITOR_SECRET_KEY
         generateValue: true
       - key: TRANSCRITOR_OLLAMA_ENABLED
         value: "0"
       - key: TRANSCRITOR_COOKIE_SECURE
         value: "1"
-    disk:
-      name: transcritor-data
-      mountPath: /var/data
-      sizeGB: 10
