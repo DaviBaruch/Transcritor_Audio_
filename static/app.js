@@ -247,6 +247,14 @@ window.App = { verHistorico: id => { estado.sel = id; mostrar('historico'); abri
 
 async function iniciar() {
   iniciarBarraAjustavel();
+  const appShell = document.querySelector('.app');
+  const alternarMenu = aberto => {
+    appShell.classList.toggle('menu-aberto', aberto);
+    $('menu-toggle').setAttribute('aria-expanded', String(aberto));
+    $('menu-toggle').textContent = aberto ? '×' : '☰';
+  };
+  $('menu-toggle').onclick = () => alternarMenu(!appShell.classList.contains('menu-aberto'));
+  $('menu-backdrop').onclick = () => alternarMenu(false);
   estado.cfg = await (await fetch('/api/config')).json();
   fetch('/api/perfil').then(r => r.json()).then(p => { aplicarPerfil(p); $('tema').value = p.tema || 'aurora'; });
   $('sair').onclick = async () => { $('user').textContent = ''; if ($('usuario')) $('usuario').value = ''; if ($('senha')) $('senha').value = ''; await fetch('/api/sair', { method: 'POST' }); location.href = '/login'; };
@@ -269,16 +277,22 @@ async function iniciar() {
     $('destino').replaceChildren(...estado.cfg.pastas.map(p => el('option', { value: p, text: caminho(p), ...(p === j.pasta ? { selected: 'selected' } : {}) })));
     if (typeof window.atualizarPastasAoVivo === 'function') window.atualizarPastasAoVivo(estado.cfg.pastas);
   };
-  $('importar-pastas').onclick = () => $('pasta-computador').click();
+  $('importar-pastas').onclick = () => {
+    const input = $('pasta-computador');
+    const celular = matchMedia('(max-width: 700px)').matches;
+    if (celular) { input.removeAttribute('webkitdirectory'); input.removeAttribute('directory'); }
+    else { input.setAttribute('webkitdirectory', ''); input.setAttribute('directory', ''); }
+    input.click();
+  };
   $('pasta-computador').onchange = async e => {
-    const caminhos = [...e.target.files].map(f => f.webkitRelativePath).filter(Boolean);
+    const caminhos = [...e.target.files].map(f => f.webkitRelativePath || f.name).filter(Boolean);
     const r = await fetch('/api/pastas/importar', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ caminhos }) });
     const j = await r.json();
     if (!r.ok) { alert(j.erro || 'Não foi possível importar as pastas.'); return; }
     estado.cfg = await (await fetch('/api/config')).json();
     alert(`${j.criadas} pasta(s) importada(s).`); e.target.value = '';
   };
-  document.querySelectorAll('.nav').forEach(b => b.onclick = () => mostrar(b.dataset.nav));
+  document.querySelectorAll('.nav').forEach(b => b.onclick = () => { mostrar(b.dataset.nav); alternarMenu(false); });
   document.querySelectorAll('.chip').forEach(c => c.onclick = () => {
     estado.filtro = c.dataset.f;
     document.querySelectorAll('.nav').forEach(b =>
