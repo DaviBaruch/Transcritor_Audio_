@@ -24,7 +24,10 @@
 
     <div id="g-conf" class="hidden">
       <label class="lbl" for="conf">Confirmar senha</label>
-      <input type="password" id="conf" autocomplete="new-password">
+      <div class="senha">
+        <input type="password" id="conf" autocomplete="new-password">
+        <button type="button" id="olho-conf">Mostrar</button>
+      </div>
     </div>
 
     <label class="lembrar"><input type="checkbox" id="lembrar" checked> Manter conectado por 30 dias</label>
@@ -71,6 +74,12 @@ $('olho').onclick = () => {
   $('senha').type = oculta ? 'text' : 'password';
   $('olho').textContent = oculta ? 'Ocultar' : 'Mostrar';
 };
+const alternarSenha = (campo, botao) => {
+  const oculta = $(campo).type === 'password';
+  $(campo).type = oculta ? 'text' : 'password';
+  $(botao).textContent = oculta ? 'Ocultar' : 'Mostrar';
+};
+$('olho-conf').onclick = () => alternarSenha('conf', 'olho-conf');
 $('f').onsubmit = async e => {
   e.preventDefault();
   const m = $('amsg'); m.textContent = '';
