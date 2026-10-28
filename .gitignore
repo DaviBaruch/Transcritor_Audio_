@@ -1,0 +1,25 @@
+.env
+__pycache__/
+*.py[cod]
+.pytest_cache/
+cache_interpretacoes.json
+historico.json
+usuarios.json
+dados_usuarios/
+*.log
+
+# Modelos baixados pelo faster-whisper
+.cache/
+models/
+
+# Arquivos de áudio e notas geradas localmente
+*.mp3
+*.wav
+*.m4a
+*.ogg
+*.flac
+*.webm
+*.mp4
+*.aac
+*.wma
+*.opus

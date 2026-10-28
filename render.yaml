@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: transcritor-audio
+    runtime: python
+    plan: starter
+    buildCommand: apt-get update && apt-get install -y ffmpeg && pip install -r requirements.txt
+    startCommand: python servidor_producao.py
+    healthCheckPath: /api/config
+    envVars:
+      - key: TRANSCRITOR_PUBLIC_MODE
+        value: "1"
+      - key: TRANSCRITOR_ALLOW_REGISTRATION
+        value: "0"
+      - key: TRANSCRITOR_DATA_ROOT
+        value: /var/data/dados_usuarios
+      - key: TRANSCRITOR_SECRET_KEY
+        generateValue: true
+      - key: TRANSCRITOR_OLLAMA_ENABLED
+        value: "0"
+      - key: TRANSCRITOR_COOKIE_SECURE
+        value: "1"
+    disk:
+      name: transcritor-data
+      mountPath: /var/data
+      sizeGB: 10
