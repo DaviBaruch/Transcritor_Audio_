@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Entrar · Transcritor</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="auth">
+<main class="auth-wrap">
+  <form class="auth-card" id="f" autocomplete="off">
+    <div class="eq grande" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <h1 id="t">Transcritor</h1>
+    <p class="sub" id="s">Segundo Cérebro</p>
+
+    <label class="lbl" for="usuario">Usuário</label>
+    <input type="text" id="usuario" name="username" autocomplete="off" required autofocus>
+
+    <label class="lbl" for="senha">Senha</label>
+    <div class="senha">
+      <input type="password" id="senha" name="password" autocomplete="off" required>
+      <button type="button" id="olho">Mostrar</button>
+    </div>
+
+    <div id="g-conf" class="hidden">
+      <label class="lbl" for="conf">Confirmar senha</label>
+      <input type="password" id="conf" autocomplete="new-password">
+    </div>
+
+    <label class="lembrar"><input type="checkbox" id="lembrar" checked> Manter conectado por 30 dias</label>
+    <button class="btn" id="ok" type="submit">Entrar</button>
+    <div id="amsg" role="alert"></div>
+    <button class="login-toggle" id="trocar" type="button">Criar novo usuário</button>
+    <p class="nota" id="nota"></p>
+  </form>
+</main>
+<script src="/static/fundo.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+let criar = false;
+(async () => {
+  let a;
+  try { const r = await fetch('/api/auth'); if (!r.ok) throw 0; a = await r.json(); }
+  catch (e) { $('amsg').textContent = 'O servidor está desatualizado ou parado: feche a janela preta do .bat e abra de novo.'; $('ok').disabled = true; return; }
+  if (a.logado) return location.replace('/');
+  criar = a.primeiro_acesso;
+  $('t').textContent = criar ? 'Crie seu acesso' : 'Bem-vindo de volta';
+  $('s').textContent = criar ? 'Primeiro uso: escolha um usuário e uma senha para proteger o seu Segundo Cérebro.' : 'Entre para transcrever seus áudios.';
+  $('g-conf').classList.toggle('hidden', !criar);
+  $('conf').required = criar;
+  $('senha').autocomplete = criar ? 'new-password' : 'current-password';
+  $('usuario').autocomplete = criar ? 'off' : 'username';
+  $('ok').textContent = criar ? 'Criar conta e entrar' : 'Entrar';
+  $('nota').textContent = criar
+    ? 'Seus dados ficam só neste computador. A senha é guardada com criptografia (hash), nunca em texto puro.'
+    : 'Esqueceu a senha? Apague o arquivo usuarios.json da pasta Transcritor_Audio e abra de novo para criar outra.';
+  $('trocar').textContent = criar ? 'Já tenho uma conta' : 'Criar novo usuário';
+  $('trocar').classList.toggle('hidden', !a.cadastro_aberto && !criar);
+})();
+$('trocar').onclick = () => {
+  criar = !criar;
+  $('t').textContent = criar ? 'Crie seu acesso' : 'Bem-vindo de volta';
+  $('s').textContent = criar ? 'Crie um espaço separado para suas transcrições.' : 'Entre para transcrever seus áudios.';
+  $('g-conf').classList.toggle('hidden', !criar); $('conf').required = criar;
+  $('senha').autocomplete = criar ? 'new-password' : 'current-password';
+  $('ok').textContent = criar ? 'Criar conta e entrar' : 'Entrar';
+  $('trocar').textContent = criar ? 'Já tenho uma conta' : 'Criar novo usuário';
+};
+$('olho').onclick = () => {
+  const oculta = $('senha').type === 'password';
+  $('senha').type = oculta ? 'text' : 'password';
+  $('olho').textContent = oculta ? 'Ocultar' : 'Mostrar';
+};
+$('f').onsubmit = async e => {
+  e.preventDefault();
+  const m = $('amsg'); m.textContent = '';
+  if (criar && $('senha').value !== $('conf').value) { m.textContent = 'As senhas não conferem.'; return; }
+  $('ok').disabled = true;
+  try {
+    const r = await fetch(criar ? '/api/registrar' : '/api/entrar', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ usuario: $('usuario').value, senha: $('senha').value, lembrar: $('lembrar').checked }) });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(j.erro || 'Falha ao entrar.');
+    location.href = '/';
+  } catch (err) { m.textContent = err.message; $('ok').disabled = false; }
+};
+</script>
+</body>
+</html>

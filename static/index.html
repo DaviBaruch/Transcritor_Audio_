@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Transcritor · Segundo Cérebro</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand"><span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>Transcritor</div>
+    <nav>
+      <button class="nav" data-nav="transcrever"><svg viewBox="0 0 16 16"><path d="M8 1.5a2.5 2.5 0 0 0-2.5 2.5v4a2.5 2.5 0 0 0 5 0V4A2.5 2.5 0 0 0 8 1.5Zm-4 6.5a.75.75 0 0 0-1.5 0 5.5 5.5 0 0 0 4.75 5.45V14.5h-1.5a.75.75 0 0 0 0 1.5h4.5a.75.75 0 0 0 0-1.5h-1.5v-1.05A5.5 5.5 0 0 0 13.5 8 .75.75 0 0 0 12 8a4 4 0 0 1-8 0Z"/></svg>Transcrever</button>
+      <button class="nav" data-nav="historico"><svg viewBox="0 0 16 16"><path d="M8 2a6 6 0 1 0 0 12A6 6 0 0 0 8 2ZM.5 8a7.5 7.5 0 1 1 15 0 7.5 7.5 0 0 1-15 0Zm7.5-3.25a.75.75 0 0 1 .75.75v2.19l1.28 1.28a.75.75 0 1 1-1.06 1.06l-1.5-1.5A.75.75 0 0 1 7.25 8V5.5A.75.75 0 0 1 8 4.75Z"/></svg>Histórico<span class="badge" id="b-todas"></span></button>
+      <button class="nav" data-nav="organizar"><svg viewBox="0 0 16 16"><path d="M1.5 3.75C1.5 2.78 2.28 2 3.25 2h2.5c.4 0 .78.16 1.06.44L7.62 3.25h5.13c.97 0 1.75.78 1.75 1.75v7.25c0 .97-.78 1.75-1.75 1.75H3.25A1.75 1.75 0 0 1 1.5 12.25v-8.5Z"/></svg>Organizar<span class="badge acc" id="b-pend"></span></button>
+      <button class="nav" data-nav="ao-vivo"><svg viewBox="0 0 16 16"><path d="M8 1.5a2.5 2.5 0 0 0-2.5 2.5v4a2.5 2.5 0 0 0 5 0V4A2.5 2.5 0 0 0 8 1.5ZM3 8a.75.75 0 0 0-1.5 0A6.5 6.5 0 0 0 7 14.38v.87H5.5a.75.75 0 0 0 0 1.5h5a.75.75 0 0 0 0-1.5H9v-.87A6.5 6.5 0 0 0 14.5 8a.75.75 0 0 0-1.5 0 5 5 0 0 1-10 0Z"/></svg>Gravar ao vivo</button>
+    </nav>
+    <div class="side-foot"><div class="quem"><button class="avatar" id="perfil-btn" type="button"><span id="avatar-letra">?</span><img id="avatar-img" alt=""></button><span id="user"></span><button id="sair" type="button">Sair</button></div>Local · custo 0</div>
+  </aside>
+  <div class="resize-handle" id="resize-handle" role="separator" aria-label="Ajustar largura da barra lateral" tabindex="0"></div>
+
+  <main>
+    <section id="v-transcrever" class="view">
+      <div class="col">
+        <h1>Transcrever áudio</h1>
+        <p class="sub">O áudio vira uma nota <code>.md</code> no padrão do Segundo Cérebro, com resumo, ações e transcrição.</p>
+
+        <div id="drop" tabindex="0">
+          <div class="drop-t">Solte o áudio aqui ou clique para escolher</div>
+          <div class="drop-s">mp3 · wav · m4a · ogg · flac · webm · mp4 · aac · opus</div>
+          <div class="drop-f" id="arq"></div>
+        </div>
+        <input type="file" id="file" hidden accept="audio/*,video/mp4,.m4a,.opus,.flac">
+
+        <label class="lbl">Título</label>
+        <input type="text" id="titulo" placeholder="Ex.: Aula Banco de Dados - Chaves">
+
+        <div class="grid3">
+          <div><label class="lbl">Salvar em</label><select id="destino"></select></div>
+          <div><label class="lbl">Qualidade</label>
+            <select id="modelo">
+              <option value="base">Rápido · base</option>
+              <option value="small" selected>Equilibrado · small</option>
+              <option value="medium">Preciso · medium</option>
+            </select></div>
+          <div><label class="lbl">Idioma</label>
+            <select id="idioma"><option value="pt" selected>Português</option><option value="auto">Detectar</option><option value="en">Inglês</option></select></div>
+        </div>
+        <p class="hint" id="dica"></p>
+
+        <button class="btn" id="go" disabled>Transcrever</button>
+        <div id="barra"><i></i></div>
+        <div id="msg"></div>
+      </div>
+    </section>
+
+    <section id="v-historico" class="view hidden">
+      <div class="split">
+        <div class="list-pane">
+          <div class="list-head"><div class="organizar-acoes"><b>Organização</b><button class="btn ghost" id="nova-pasta" type="button">+ Nova pasta</button><button class="btn ghost" id="importar-pastas" type="button">Selecionar pasta do computador</button><input id="pasta-computador" type="file" webkitdirectory directory multiple hidden><small>As subpastas serão importadas para o espaço deste usuário.</small></div>
+            <input type="text" id="busca" placeholder="Buscar no histórico">
+            <div class="chips" id="chips">
+              <button class="chip" data-f="todas">Todas</button>
+              <button class="chip" data-f="inbox">Para organizar</button>
+              <button class="chip" data-f="organizada">Organizadas</button>
+            </div>
+          </div>
+          <div id="lista"></div>
+        </div>
+        <div class="detail-pane" id="detalhe"></div>
+      </div>
+    </section>
+    <section id="v-ao-vivo" class="view hidden">
+      <div class="col live-col">
+        <h1>Gravar e transcrever ao vivo</h1>
+        <p class="sub">Escolha o microfone, o áudio do computador ou os dois. A transcrição aparece enquanto você fala.</p>
+        <div class="live-card">
+          <label class="lbl">Fonte de áudio</label>
+          <select id="av-fonte"><option value="mic">Microfone</option><option value="sistema">Computador (tela ou guia)</option><option value="ambos" selected>Microfone + computador</option></select>
+          <div class="grid3">
+            <div><label class="lbl">Salvar em</label><select id="av-destino"></select></div>
+            <div><label class="lbl">Qualidade</label><select id="av-modelo"><option value="tiny">Rápida · tiny</option><option value="base" selected>Equilibrada · base</option><option value="small">Precisa · small</option></select></div>
+            <div><label class="lbl">Idioma</label><select id="av-idioma"><option value="pt" selected>Português</option><option value="auto">Detectar</option><option value="en">Inglês</option></select></div>
+          </div>
+          <label class="lbl">Título</label><input type="text" id="av-titulo" placeholder="Ex.: Reunião de projeto">
+          <p class="hint" id="av-dica"></p>
+          <label class="check"><input type="checkbox" id="av-guardar" checked> Guardar também o áudio para baixar no final</label>
+          <div id="av-vu" class="vu" aria-label="Nível do áudio"></div>
+          <div class="live-status"><b id="av-tempo">00:00</b><span id="av-estado">Pronto para iniciar</span></div>
+          <button class="btn" id="av-ini">Iniciar gravação</button><button class="btn perigo" id="av-parar" hidden>Parar e salvar</button><button class="btn ghost" id="av-desc" hidden>Descartar</button>
+          <div id="av-msg"></div><div id="av-live" class="live-text"><div class="vazio">A transcrição aparecerá aqui.</div></div><div id="av-fim"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<dialog id="dlg-del">
+  <h3>Excluir transcrição</h3>
+  <p id="del-p"></p>
+  <div class="op"><button class="btn" id="del-hist" type="button">Remover só do histórico</button>
+    <small>A nota continua no Obsidian.</small></div>
+  <div class="op" id="op-nota"><button class="btn perigo" id="del-nota" type="button">Excluir também a nota do Obsidian</button>
+    <small>A nota vai para a lixeira do Obsidian (dá para restaurar) e o link no índice da área é removido.</small></div>
+  <div id="del-msg" role="status"></div>
+  <button class="btn ghost" id="del-cancel" type="button">Cancelar</button>
+</dialog>
+<dialog id="dlg-perfil">
+  <h3>Perfil e aparência</h3>
+  <div class="perfil-top"><button class="avatar grande" id="perfil-foto-btn" type="button"><span id="perfil-letra">?</span><img id="perfil-img" alt=""></button><div><b id="perfil-nome"></b><p>Preferências deste usuário</p></div></div>
+  <input id="perfil-arquivo" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+  <label class="lbl" for="tema">Tema</label>
+  <select id="tema"><option value="aurora">Aurora</option><option value="oceano">Oceano profissional</option><option value="grafite">Grafite executivo</option><option value="floresta">Floresta calma</option><option value="neon">Neon criativo</option><option value="papel">Papel claro</option></select>
+  <div id="perfil-msg"></div><button class="btn" id="perfil-salvar" type="button">Salvar preferências</button><button class="btn ghost" id="perfil-fechar" type="button">Fechar</button>
+</dialog>
+<script src="/static/fundo.js"></script>
+<script src="/static/app.js"></script>
+<script src="/static/aovivo.js"></script>
+</body>
+</html>
