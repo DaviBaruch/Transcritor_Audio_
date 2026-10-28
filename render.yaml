@@ -3,7 +3,7 @@ services:
     name: transcritor-audio
     runtime: python
     plan: starter
-    buildCommand: apt-get update && apt-get install -y ffmpeg && pip install -r requirements.txt
+    buildCommand: pip install -r requirements.txt
     startCommand: python servidor_producao.py
     healthCheckPath: /api/config
     envVars:
