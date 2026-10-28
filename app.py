@@ -546,6 +546,7 @@ def ler_usuarios():
 
 
 def salvar_usuarios(u):
+    USUARIOS.parent.mkdir(parents=True, exist_ok=True)
     tmp = USUARIOS.with_suffix(".tmp")
     tmp.write_text(json.dumps(u, ensure_ascii=False, indent=1), encoding="utf-8")
     os.replace(tmp, USUARIOS)
