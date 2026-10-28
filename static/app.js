@@ -286,11 +286,16 @@ async function iniciar() {
   };
   $('pasta-computador').onchange = async e => {
     const caminhos = [...e.target.files].map(f => f.webkitRelativePath || f.name).filter(Boolean);
-    const r = await fetch('/api/pastas/importar', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ caminhos }) });
-    const j = await r.json();
-    if (!r.ok) { alert(j.erro || 'Não foi possível importar as pastas.'); return; }
+    if (!caminhos.length) return;
+    let criadas = 0;
+    for (let i = 0; i < caminhos.length; i += 1000) {
+      const r = await fetch('/api/pastas/importar', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ caminhos: caminhos.slice(i, i + 1000) }) });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) { alert(j.erro || 'Não foi possível importar as pastas.'); return; }
+      criadas += j.criadas || 0;
+    }
     estado.cfg = await (await fetch('/api/config')).json();
-    alert(`${j.criadas} pasta(s) importada(s).`); e.target.value = '';
+    alert(`${criadas} pasta(s) importada(s).`); e.target.value = '';
   };
   document.querySelectorAll('.nav').forEach(b => b.onclick = () => { mostrar(b.dataset.nav); alternarMenu(false); });
   document.querySelectorAll('.chip').forEach(c => c.onclick = () => {
