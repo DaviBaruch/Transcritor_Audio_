@@ -72,6 +72,17 @@ function indicarProcessamento(inicio) {
 // ---- captura: acumula blocos e corta o trecho numa pausa (ou no máximo a cada 14 s) ----
 function captar(s, x) {
   if (!s.ativo) return;
+  if (s.sampleRate !== TAXA) {
+    const escala = TAXA / s.sampleRate;
+    const saida = new Float32Array(Math.max(1, Math.floor(x.length * escala)));
+    for (let i = 0; i < saida.length; i++) {
+      const inicio = Math.floor(i / escala), fim = Math.min(x.length, Math.max(inicio + 1, Math.floor((i + 1) / escala)));
+      let soma = 0;
+      for (let j = inicio; j < fim; j++) soma += x[j];
+      saida[i] = soma / (fim - inicio);
+    }
+    x = saida;
+  }
   let soma = 0;
   for (let i = 0; i < x.length; i++) soma += x[i] * x[i];
   const rms = Math.sqrt(soma / x.length);
