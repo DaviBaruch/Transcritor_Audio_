@@ -10,7 +10,7 @@ services:
       - key: TRANSCRITOR_PUBLIC_MODE
         value: "1"
       - key: TRANSCRITOR_ALLOW_REGISTRATION
-        value: "0"
+        value: "1"
       - key: TRANSCRITOR_DATA_ROOT
         value: /var/data/dados_usuarios
       - key: TRANSCRITOR_SECRET_KEY
